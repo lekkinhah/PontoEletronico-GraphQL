@@ -60,6 +60,7 @@ const typeDefs = gql`
 
     type Subscription {
         onCreatedUser: User
+        onRegisteredTime: RegisteredTime
     }
 
     input CreateUserInput {
@@ -107,10 +108,14 @@ const resolver = {
                 where: { id }
             })
             console.log(user)
-            const registeredTime = await RegisteredTime.create(body.data)           
-           
+            const registeredTime = await RegisteredTime.create(body.data)
+
             await registeredTime.setUser(user.get('id'))
-            return registeredTime.reload({ include: [User] })
+            const reloadedregisteredTime = registeredTime.reload({ include: [User] })
+            pubSub.publish('registeredTime', {
+                onRegisteredTime: reloadedregisteredTime
+            })
+            return reloadedregisteredTime
         },
         async updateRegisteredTime(parent, body, context, info) {
             const registeredTime = await RegisteredTime.findOne({
@@ -184,6 +189,9 @@ const resolver = {
     Subscription: {
         onCreatedUser: {
             subscribe: () => pubSub.asyncIterator('createdUser')
+        },
+        onRegisteredTime: {
+            subscribe: () => pubSub.asyncIterator('registeredTime')
         }
     }
 }

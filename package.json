@@ -1,0 +1,19 @@
+{
+  "name": "pontoeletronico-graphql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.9.6",
+    "bcrypt": "^3.0.6",
+    "graphql": "^14.5.8",
+    "jsonwebtoken": "^8.5.1",
+    "sequelize": "^5.21.1",
+    "sqlite3": "^4.1.0"
+  }
+}

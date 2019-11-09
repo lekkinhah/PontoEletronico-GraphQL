@@ -34,6 +34,7 @@ const typeDefs = gql`
     }
 
     type Query {
+        myRegisteredTimes: [RegisteredTime] @auth(role: WORKER)
         allRegisteredTimes: [RegisteredTime] @auth(role: ADMIN)
         allUsers: [User] @auth(role: ADMIN)
     }
@@ -88,6 +89,16 @@ const typeDefs = gql`
 
 const resolver = {
     Query: {
+        async myRegisteredTimes(parent, body, context, info) {
+            const token = context.headers.authorization
+            const jwtData = jwt.decode(token.replace('Bearer ', ''))
+            const { id } = jwtData
+            const user = await User.findOne({ where: { id } })
+            return RegisteredTime.findAll({ 
+                where: { userId: user.id },
+                include: [User] 
+            })
+        },
         allRegisteredTimes() {
             return RegisteredTime.findAll({ include: [User] })
         },
@@ -98,7 +109,6 @@ const resolver = {
     Mutation: {
         async createRegisteredTime(parent, body, context, info) {
            
-            console.log("CRIANDO REGISTRO");
             const token = context.headers.authorization
            
             const jwtData = jwt.decode(token.replace('Bearer ', ''))
